@@ -1,0 +1,25 @@
+# install brew
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" 
+
+#install pandoc module
+brew install pandoc 
+
+# Convert .html to .md using the pandoc module
+pandoc ./Basic_Data_Wrangling.html -o Basic_Data_Wrangling.md 
+
+# Rename .md to .rmd using the mv command
+mv Basic_Data_Wrangling.md Basic_Data_Wrangling.rmd 
+
+# Replace the r with {r} using the sed command
+ sed -e 's/``` r/``` {r}/' Basic_Data_Wrangling.rmd 
+
+# Delete the lines that they beging with ':::'
+sed -i '' -e '/^:::/d' Basic_Data_Wrangling.rmd
+
+# Add YAML header
+
+echo "$(echo -e "\n" | cat -  Basic_Data_Wrangling.rmd) " > Basic_Data_Wrangling
+echo "$(echo '---' | cat Basic_Data_Wrangling.rmd)" > Basic_Data_Wrangling.rmd
+echo "$(echo 'title: '\"'Basic_Data_Wrangling'\" | cat -  Basic_Data_Wrangling.rmd)" > Basic_Data_Wrangling.rmd
+echo "$(echo '---' | cat Basic_Data_Wrangling.rmd)" > Basic_Data_Wrangling.rmd
+

@@ -1,0 +1,182 @@
+---
+title: "Basic_Data_Wrangling"
+---
+# Basic_Data_Wrangling {#basic_data_wrangling .title .toc-ignore}
+
+# Basic_Data_Wrangling {#basic_data_wrangling-1 .title .toc-ignore}
+
+#### Andreas Venizelos {#andreas-venizelos .author}
+
+#### 2022-03-30 {#section .date}
+
+## Downloading Data
+
+One of the most important lesson in R is filtering and cleaning up you
+data, in order to generate an easy to read and to handle dataset. First
+of all we need to import a dataset. There are many sources for publicly
+avaliable big data such as: <https://genome.ucsc.edu/> ,
+<https://www.ensembl.org/>, <https://www.encodeproject.org/>. I have
+already downloaded a dataset for you. You can download the **txt file**
+here:
+
+Download txt file
+
+## Install Packages and Loading Libraries
+
+First step is to install packages either from CRAN, Bioconductor or from
+Github and to load the libraries.
+
+``` {r}
+library(data.table)
+library(dplyr)
+library(tidyverse)
+library(tm)
+```
+
+## Importing Data
+
+Now we will go ahead to import our dataset. There are many ways to
+import a dataset depending on the file type and the size of the file.
+Here I am going to show you two ways of importing a dataset with the
+latter one to be preferred for larger datasets.
+
+### Method 1
+
+``` {r}
+filename <- "Encode_HMM_data.txt"
+my_data <- read.csv(filename, sep=" ", header=FALSE)
+```
+
+### Method 2
+
+``` {r}
+library(data.table)
+my_data <- fread(filename)
+```
+
+``` {r}
+head(my_data)
+```
+
+    ##      V1    V2    V3                V4 V5 V6    V7    V8          V9
+    ## 1: chr1 10000 10600 15_Repetitive/CNV  0  . 10000 10600 245,245,245
+    ## 2: chr1 10600 11137 13_Heterochrom/lo  0  . 10600 11137 245,245,245
+    ## 3: chr1 11137 11737       8_Insulator  0  . 11137 11737  10,190,254
+    ## 4: chr1 11737 11937       11_Weak_Txn  0  . 11737 11937 153,255,102
+    ## 5: chr1 11937 12137   7_Weak_Enhancer  0  . 11937 12137   255,252,4
+    ## 6: chr1 12137 14537       11_Weak_Txn  0  . 12137 14537 153,255,102
+
+``` {r}
+library(dplyr)
+glimpse(my_data)
+```
+
+    ## Rows: 571,339
+    ## Columns: 9
+    ## $ V1 <chr> "chr1", "chr1", "chr1", "chr1", "chr1", "chr1", "chr1", "chr1", "ch…
+    ## $ V2 <int> 10000, 10600, 11137, 11737, 11937, 12137, 14537, 20337, 22137, 2293…
+    ## $ V3 <int> 10600, 11137, 11737, 11937, 12137, 14537, 20337, 22137, 22937, 2693…
+    ## $ V4 <chr> "15_Repetitive/CNV", "13_Heterochrom/lo", "8_Insulator", "11_Weak_T…
+    ## $ V5 <int> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+    ## $ V6 <chr> ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".", ".…
+    ## $ V7 <int> 10000, 10600, 11137, 11737, 11937, 12137, 14537, 20337, 22137, 2293…
+    ## $ V8 <int> 10600, 11137, 11737, 11937, 12137, 14537, 20337, 22137, 22937, 2693…
+    ## $ V9 <chr> "245,245,245", "245,245,245", "10,190,254", "153,255,102", "255,252…
+
+## Select Columns
+
+We can see that succesfully we have imported our dataset in R studio.
+It's a dataframe with *571,339* rows and *9* columns. We will go ahead
+and we will select the first *4* columns from our data set and to ignore
+the rest of the columns. Again there are many ways of doing that. Here I
+can show you *2* ways :
+
+### Method 1
+
+``` {r}
+my_data %>% select(V1,V2,V3,V4)
+```
+
+    ##           V1        V2        V3                V4
+    ##      1: chr1     10000     10600 15_Repetitive/CNV
+    ##      2: chr1     10600     11137 13_Heterochrom/lo
+    ##      3: chr1     11137     11737       8_Insulator
+    ##      4: chr1     11737     11937       11_Weak_Txn
+    ##      5: chr1     11937     12137   7_Weak_Enhancer
+    ##     ---                                           
+    ## 571335: chrX 155251806 155255406 10_Txn_Elongation
+    ## 571336: chrX 155255406 155257806       11_Weak_Txn
+    ## 571337: chrX 155257806 155258806       8_Insulator
+    ## 571338: chrX 155258806 155259606 13_Heterochrom/lo
+    ## 571339: chrX 155259606 155260406 15_Repetitive/CNV
+
+### Method 2
+
+``` {r}
+my_data[,1:4]
+```
+
+    ##           V1        V2        V3                V4
+    ##      1: chr1     10000     10600 15_Repetitive/CNV
+    ##      2: chr1     10600     11137 13_Heterochrom/lo
+    ##      3: chr1     11137     11737       8_Insulator
+    ##      4: chr1     11737     11937       11_Weak_Txn
+    ##      5: chr1     11937     12137   7_Weak_Enhancer
+    ##     ---                                           
+    ## 571335: chrX 155251806 155255406 10_Txn_Elongation
+    ## 571336: chrX 155255406 155257806       11_Weak_Txn
+    ## 571337: chrX 155257806 155258806       8_Insulator
+    ## 571338: chrX 155258806 155259606 13_Heterochrom/lo
+    ## 571339: chrX 155259606 155260406 15_Repetitive/CNV
+
+``` {r}
+sorted_data <- my_data[,1:4]
+```
+
+## Adding Column Names
+
+Now we have selected successfully the columns that we need. However, we
+need to rename the columns in order to have a more clean data set.
+
+``` {r}
+colnames(sorted_data)[1:4] <- c("Chromosome","Start","Stop","Type")
+head(sorted_data)
+```
+
+    ##    Chromosome Start  Stop              Type
+    ## 1:       chr1 10000 10600 15_Repetitive/CNV
+    ## 2:       chr1 10600 11137 13_Heterochrom/lo
+    ## 3:       chr1 11137 11737       8_Insulator
+    ## 4:       chr1 11737 11937       11_Weak_Txn
+    ## 5:       chr1 11937 12137   7_Weak_Enhancer
+    ## 6:       chr1 12137 14537       11_Weak_Txn
+
+## Final Clean-Up
+
+Now we have a more defined clean data set. However, there is a string
+including a number and an underscore as prefix in each character value
+of the column *Type*. Below again *2* ways to remove this string:
+
+### Method 1
+
+``` {r}
+sorted_data$Type <- gsub('[[:digit:]]+_','', sorted_data$Type)
+```
+
+### Method 2
+
+``` {r}
+sorted_data$Type <- str_replace_all(sorted_data$Type, "[:digit:]+_","")
+head(sorted_data)
+```
+
+    ##    Chromosome Start  Stop           Type
+    ## 1:       chr1 10000 10600 Repetitive/CNV
+    ## 2:       chr1 10600 11137 Heterochrom/lo
+    ## 3:       chr1 11137 11737      Insulator
+    ## 4:       chr1 11737 11937       Weak_Txn
+    ## 5:       chr1 11937 12137  Weak_Enhancer
+    ## 6:       chr1 12137 14537       Weak_Txn
+
+And here you have it ! A final clean data set easy to read and work
+with.
